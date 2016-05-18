@@ -64,26 +64,15 @@ func templatePathWalk(p string, f os.FileInfo, suffix string, err error) error {
 }
 
 func Init_Templates(dirName string, suffix string) error {
-
 	templatesFuncMap = make(template.FuncMap)
 	tmplPaths = make(map[string]tmplPath)
-
-	err := filepath.Walk(strings.TrimRight(dirName, "/"), func(p string, f os.FileInfo, err error) error {
-		return templatePathWalk(p, f, suffix, err)
-	})
-
-	if nil != err {
-		return err
-	}
-
-	for k, v := range tmplPaths {
-		if strings.EqualFold(strings.ToLower(v.suffix), strings.ToLower(suffix)) {
-			tk := k[len(dirName)+1 : len(k)]
-			htmlStr, err := ioutil.ReadFile(v.path)
-			if err != nil {
-				return err
-			}
-			htmlTxt := string(htmlStr)
+	
+	fileNames:=apibox.Assest.GetFileNames(dirName)
+	
+	for _,name := range fileNames {
+		if strings.EqualFold(strings.ToLower(filepath.Ext(name)), strings.ToLower(suffix)) {
+			tk := name[len(dirName)+1 : len(name)-len(suffix)]
+			htmlTxt:=apibox.Assest.GetContent(name)
 			if len(htmlTxt) != 0 {
 				var t *template.Template
 				if templates == nil {
@@ -260,7 +249,7 @@ func init() {
 		apibox.Log_Fatal(err.Error())
 	}
 	apibox.Load_Mime(apibox.MimePath)
-	if err := Init_Templates(apibox.Get_Project_Dir()+apibox.PathSeparator+strings.TrimLeft(Conf.Web.TemplateDir, "/"), Conf.Web.TemplateSuffix); nil != err {
+	if err := Init_Templates("/res/"+Conf.Web.TemplateDir, Conf.Web.TemplateSuffix); nil != err {
 		apibox.Log_Fatal(err)
 	}
 	server.DefaultServeMux.AddStaticDir(Conf.Web.StaticDir)

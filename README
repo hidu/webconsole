@@ -123,3 +123,7 @@ Github:  https://github.com/shibingli/webconsole
                     alert(json.data.en_addr);
                 }
             });
+
+三、静态资源
+使用`goassest`（`go get -u github.com/hidu/goassest`）工具来将静态资源打包到go文件中以供使用。  
+然后在当前根目录下运行命令：`goassest` 来对打包文件进行更新。

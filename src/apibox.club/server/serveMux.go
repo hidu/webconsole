@@ -164,14 +164,9 @@ func (mux *ServeMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	WebSession = RegSession(w, r, ABC_Conf.Web.SessionTimeOut, ABC_Conf.Web.EnableTLS)
 	rPath := cleanPath(r.URL.Path)
-	for _, s := range mux.staticDir {
-		if strings.HasPrefix(rPath, s) {
-			file_path := s + rPath[len(s):]
-			file_path = strings.Trim(file_path, "/")
-			file_path = apibox.Get_Project_Dir() + apibox.PathSeparator + file_path
-			apibox.Gzip_File(file_path, w, r)
-			return
-		}
+	if(strings.HasPrefix(rPath,"/static/")){
+		apibox.Assest.FileHandlerFunc("/res"+rPath).ServeHTTP(w,r)
+		return
 	}
 	w.Header().Add("Server", mux.serverName)
 	h, _ := mux.Handler(r)
